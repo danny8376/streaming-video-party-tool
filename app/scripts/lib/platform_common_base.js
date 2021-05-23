@@ -3,6 +3,7 @@ class CommonBase extends EventTarget {
         super();
         this.interval = null;
         this.lastTimeString = "";
+        this.callbacks = {};
         this.adCheckSelector = "";
         this.timeSelector = "";
     }
@@ -15,24 +16,83 @@ class CommonBase extends EventTarget {
         }));
     }
 
+    // function to access normal web scope functions using postMessage
+    sandboxEscapeCmd(cmd, ...args) {
+        const promise = new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => reject(), 1000);
+            this.callbacks[`result_${cmd}`] = (vals) => {
+                clearTimeout(timeout);
+                resolve(vals);
+            }
+        });
+        window.postMessage(["streamingVideoPartyToolPlatform_sandboxEscape", cmd, ...args].join(","));
+        return promise;
+    }
+
+    patchForSandboxEscape(case_statement) {
+        window.addEventListener("message", (e) => {
+            if (e.origin === "https://www.youtube.com") {
+                const [prefix, cmd, ...vals] = e.data.split(",");
+                if (prefix === "streamingVideoPartyToolPlatform_sandboxEscape") {
+                    if (this.callbacks[cmd]) {
+                        this.callbacks[cmd](vals);
+                    }
+                }
+            }
+        });
+
+        // inject script to escape content sandbox for calling youtube page api
+        const scriptNode = document.createElement("script");
+        scriptNode.append(`
+            (() => {
+                function response(cmd, ...vals) {
+                    window.postMessage(["streamingVideoPartyToolPlatform_sandboxEscape", "result_" + cmd, ...vals].join(","));
+                }
+
+                window.addEventListener("message", (e) => {
+                    if (e.origin === "https://www.youtube.com") {
+                        const [prefix, cmd, ...args] = e.data.split(",");
+                        if (prefix === "streamingVideoPartyToolPlatform_sandboxEscape") {
+                            ${case_statement}
+                        }
+                    }
+                });
+            })();
+        `);
+        document.body.appendChild(scriptNode);
+    }
+
     start() {
         this.interval = setInterval(() => {
-            let timeString = "";
-            if (document.querySelector(this.adCheckSelector)) {
-                // in ad
-                timeString = "0:00"
-            } else {
-                timeString = document.querySelector(this.timeSelector).textContent;
-            }
-            if (this.lastTimeString != timeString) {
-                this.lastTimeString = timeString;
-                this.dispatchVideoTimeUpdate(timeString);
-            }
+            this.loop();
         }, 100);
+    }
+
+    loop() {
+        let timeString = "";
+        if (document.querySelector(this.adCheckSelector)) {
+            // in ad
+            timeString = "0:00"
+        } else {
+            timeString = document.querySelector(this.timeSelector).textContent;
+        }
+        if (this.lastTimeString != timeString) {
+            this.lastTimeString = timeString;
+            this.dispatchVideoTimeUpdate(timeString);
+        }
     }
 
     stop() {
         clearInterval(this.interval);
+    }
+
+    formatTimeString(secs) {
+        const hours = Math.floor(secs / 60 / 60);
+        const minutes = Math.floor(secs / 60) - (hours * 60);
+        const seconds = secs % 60;
+
+        const formatted = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0');
+        return formatted;
     }
 }
 
