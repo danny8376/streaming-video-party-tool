@@ -2,7 +2,7 @@
   "name": "__MSG_appName__",
   "short_name": "__MSG_appShortName__",
   "description": "__MSG_appDescription__",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "manifest_version": 2,
   "default_locale": "en",
   "icons": {
@@ -21,6 +21,7 @@
   "permissions": [
     "*://ani.gamer.com.tw/animeVideo.php*",
     "*://www.youtube.com/watch*",
+    "*://www.youtube.com/embed/*",
     "storage"
   ],
   "browser_action": {
@@ -45,7 +46,8 @@
     },
     {
       "matches": [
-        "*://www.youtube.com/watch*"
+        "*://www.youtube.com/watch*",
+        "*://www.youtube.com/embed/*"
       ],
       "js": [
         "scripts/platform_youtube.js",
