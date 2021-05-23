@@ -53,7 +53,7 @@ class CommonBase extends EventTarget {
                 }
 
                 window.addEventListener("message", (e) => {
-                    if (e.origin === "https://www.youtube.com") {
+                    if (origins.includes(e.origin)) {
                         const [prefix, cmd, ...args] = e.data.split(",");
                         if (prefix === "streamingVideoPartyToolPlatform_sandboxEscape") {
                             ${case_statement}
