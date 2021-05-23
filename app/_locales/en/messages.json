@@ -1,0 +1,34 @@
+{
+  "appName": {
+    "message": "Streaming Video Party Tool",
+    "description": "The name of the application"
+  },
+  "appShortName": {
+    "message": "video_party",
+    "description": "The short_name (maximum of 12 characters recommended) is a short version of the app's name."
+  },
+  "appDescription": {
+    "message": "A simple tool to help holding video part mainly for streaming.",
+    "description": "The description of the application"
+  },
+  "browserActionTitle": {
+    "message": "Streaming Video Party Tool",
+    "description": "The title of the browser action button"
+  },
+  "popoutTitle": {
+    "message": "Video Time Popout",
+    "description": ""
+  },
+  "popoutVideoTimeButton": {
+    "message": "Show Time Popout",
+    "description": ""
+  },
+  "optionsPageTitle": {
+    "message": "Options",
+    "description": ""
+  },
+  "optionsVideoTimeCSS": {
+    "message": "Custom CSS for Video Time Popout",
+    "description": ""
+  }
+}

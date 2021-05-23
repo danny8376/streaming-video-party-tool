@@ -1,0 +1,34 @@
+{
+  "appName": {
+    "message": "同步視聽小工具",
+    "description": "The name of the application"
+  },
+  "appShortName": {
+    "message": "video_party",
+    "description": "The short_name (maximum of 12 characters recommended) is a short version of the app's name."
+  },
+  "appDescription": {
+    "message": "提供同步視聽實況用的小工具",
+    "description": "The description of the application"
+  },
+  "browserActionTitle": {
+    "message": "同步視聽小工具",
+    "description": "The title of the browser action button"
+  },
+  "popoutTitle": {
+    "message": "時間軸視窗",
+    "description": ""
+  },
+  "popoutVideoTimeButton": {
+    "message": "顯示時間軸視窗",
+    "description": ""
+  },
+  "optionsPageTitle": {
+    "message": "選項",
+    "description": ""
+  },
+  "optionsVideoTimeCSS": {
+    "message": "時間軸視窗的自訂CSS",
+    "description": ""
+  }
+}
