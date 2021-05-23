@@ -12,10 +12,12 @@ class YouTube extends CommonBase {
         this.patchForSandboxEscape(`
             switch (cmd) {
                 case "getCurrentTime":
-                    const secs = document.querySelector("#movie_player").getCurrentTime();
+                    const secs = player.getCurrentTime();
                     response(cmd, secs);
                     break;
             }
+        `,`
+            const player = document.querySelector("#movie_player");
         `);
 
         super.start();
@@ -30,10 +32,7 @@ class YouTube extends CommonBase {
             const [secs] = await this.sandboxEscapeCmd("getCurrentTime");
             timeString = this.formatTimeString(Math.floor(secs));
         }
-        if (this.lastTimeString != timeString) {
-            this.lastTimeString = timeString;
-            this.dispatchVideoTimeUpdate(timeString);
-        }
+        this.checkTimeUpdate(timeString);
     }
 }
 

@@ -30,7 +30,7 @@ class CommonBase extends EventTarget {
         return promise;
     }
 
-    patchForSandboxEscape(case_statement) {
+    patchForSandboxEscape(case_statement, init_statement) {
         window.addEventListener("message", (e) => {
             if (this.sandboxEscapeOrigins.includes(e.origin)) {
                 const [prefix, cmd, ...vals] = e.data.split(",");
@@ -47,6 +47,8 @@ class CommonBase extends EventTarget {
         scriptNode.append(`
             (() => {
                 const origins = ["${this.sandboxEscapeOrigins.join('", "')}"];
+
+                ${init_statement}
 
                 function response(cmd, ...vals) {
                     window.postMessage(["streamingVideoPartyToolPlatform_sandboxEscape", "result_" + cmd, ...vals].join(","));
@@ -71,6 +73,13 @@ class CommonBase extends EventTarget {
         }, 100);
     }
 
+    checkTimeUpdate(timeString) {
+        if (this.lastTimeString != timeString) {
+            this.lastTimeString = timeString;
+            this.dispatchVideoTimeUpdate(timeString);
+        }
+    }
+
     loop() {
         let timeString = "";
         if (document.querySelector(this.adCheckSelector)) {
@@ -79,10 +88,7 @@ class CommonBase extends EventTarget {
         } else {
             timeString = document.querySelector(this.timeSelector).textContent;
         }
-        if (this.lastTimeString != timeString) {
-            this.lastTimeString = timeString;
-            this.dispatchVideoTimeUpdate(timeString);
-        }
+        this.checkTimeUpdate(timeString);
     }
 
     stop() {
