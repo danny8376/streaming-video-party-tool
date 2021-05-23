@@ -3,6 +3,7 @@ import { CommonBase } from "./lib/platform_common_base";
 class YouTube extends CommonBase {
     constructor() {
         super();
+        this.sandboxEscapeOrigins = ["https://www.youtube.com"];
         this.adCheckSelector = ".ytp-ad-skip-button";
         //this.timeSelector = ".ytp-time-current";
     }

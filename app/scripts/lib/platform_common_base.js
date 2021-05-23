@@ -3,6 +3,7 @@ class CommonBase extends EventTarget {
         super();
         this.interval = null;
         this.lastTimeString = "";
+        this.sandboxEscapeOrigins = [];
         this.callbacks = {};
         this.adCheckSelector = "";
         this.timeSelector = "";
@@ -31,7 +32,7 @@ class CommonBase extends EventTarget {
 
     patchForSandboxEscape(case_statement) {
         window.addEventListener("message", (e) => {
-            if (e.origin === "https://www.youtube.com") {
+            if (this.sandboxEscapeOrigins.includes(e.origin)) {
                 const [prefix, cmd, ...vals] = e.data.split(",");
                 if (prefix === "streamingVideoPartyToolPlatform_sandboxEscape") {
                     if (this.callbacks[cmd]) {
@@ -45,6 +46,8 @@ class CommonBase extends EventTarget {
         const scriptNode = document.createElement("script");
         scriptNode.append(`
             (() => {
+                const origins = ["${this.sandboxEscapeOrigins.join('", "')}"];
+
                 function response(cmd, ...vals) {
                     window.postMessage(["streamingVideoPartyToolPlatform_sandboxEscape", "result_" + cmd, ...vals].join(","));
                 }
