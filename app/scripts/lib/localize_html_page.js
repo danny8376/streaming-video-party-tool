@@ -15,10 +15,9 @@ function localizeHtmlPage()
             if (replaced) ele.value = newVal;
         }
 
-        if ((ele.childNodes.length === 0 && ele.innerHTML !== "") ||
-           (ele.childNodes.length === 1 && ele.childNodes[0].childNodes.length === 0)) { // text node
+        if (ele.childNodes.length === 1 && ele.childNodes[0].nodeType === 3) { // text node
             const [replaced, newVal] = tryReplace(ele.innerHTML);
-            if (replaced) ele.innerHTML = newVal;
+            if (replaced) ele.childNodes[0].replaceWith(newVal);
         }
     });
 }
