@@ -17,7 +17,8 @@ keys.forEach((key) => {
 (async () => {
     const vals = await browser.storage.local.get(keys);
     keys.forEach((key) => {
-        document.querySelector(`#${key}`).value = vals[key];
+        if (typeof vals[key] !== "undefined")
+            document.querySelector(`#${key}`).value = vals[key];
     });
 })();
 
