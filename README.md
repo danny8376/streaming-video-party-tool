@@ -9,12 +9,16 @@ This plugin is availiable on following browser extensions stores.
 * [Firefox](https://addons.mozilla.org/zh-TW/firefox/addon/streaming-video-party-tool/)
 * [Chrome](https://chrome.google.com/webstore/detail/streaming-video-party-too/ejjcgcillnknldlnjomjockdceikloja)
 
-## Install
+Due to publishing process, the version above may not be latest, you can also grab latest release build at release page of this repo.
+
+## Prepare
 
 	$ npm install
 
 ## Development
 
+The following command will build test builds and watching files for hot rebuilding.
+ 
     npm run dev chrome
     npm run dev firefox
     npm run dev opera
@@ -22,14 +26,12 @@ This plugin is availiable on following browser extensions stores.
 
 ## Build
 
+The following command will build release builds.
+ 
     npm run build chrome
     npm run build firefox
     npm run build opera
     npm run build edge
-
-## Environment
-
-The build tool also defines a variable named `process.env.NODE_ENV` in your scripts. 
 
 ## Docs
 
