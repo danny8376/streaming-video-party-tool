@@ -68,7 +68,7 @@ function injectControl() {
     offsetAdd1s.value = "+1";
 
     const offsetChanged = () => {
-        userOffset = offset.value;
+        userOffset = offset.valueAsNumber;
         forceSeek = true;
     };
 
@@ -119,7 +119,8 @@ function playVideoParty(wsUrl) {
                 switch (cmd) {
                     case "sync":
                         platform.getCurrentTime().then(time => {
-                            let [targetTime] = args;
+                            const [targetTimeStr] = args;
+                            let targetTime = parseFloat(targetTimeStr);
                             targetTime += userOffset; 
                             // we don't seek if offset is within 0.5s
                             // TODO: configurable offset limit
