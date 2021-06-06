@@ -1,0 +1,32 @@
+.streaming-video-party-tool-prompt {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.9);
+    top: 0;
+    left: 0;
+    z-index: 9999;
+}
+
+.streaming-video-party-tool-prompt .prompt-box {
+    background: #f7f7f7;
+    width: 40em;
+    height: 15em;
+    margin: auto;
+    padding: 5em 3em;
+    text-align: center;
+}
+
+@media (prefers-color-scheme: light) {
+    .streaming-video-party-tool-prompt .prompt-box {
+        background: #f7f7f7;
+        color: #323232;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .streaming-video-party-tool-prompt .prompt-box {
+        background: #111111;
+        color: #F5F5F5;
+    }
+}

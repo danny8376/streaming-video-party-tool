@@ -2,19 +2,65 @@ class CommonBase extends EventTarget {
     constructor() {
         super();
         this.interval = null;
-        this.lastTimeString = "";
         this.sandboxEscapeOrigins = [];
         this.callbacks = {};
         this.adCheckSelector = "";
         this.timeSelector = "";
+        this.defaultTimeResult = [null, 0.0];
+        this.inited = false;
     }
 
-    dispatchVideoTimeUpdate(timeString) {
-        this.dispatchEvent(new CustomEvent("videoTimeUpdate", {
+    init() {
+        if (this.inited) return;
+        this._init();
+        this.inited = true;
+    }
+
+    _init() { // nothing really need to do here
+    }
+
+    dispatchVideoPlayingStatus(paused, time) {
+        this.dispatchEvent(new CustomEvent("videoPlayingStatus", {
             detail: {
-                timeString
+                paused,
+                time
             }
         }));
+    }
+
+    // ==== following funcs are async for injected js support ====
+    async getCurrentTime() {
+            const timeString = document.querySelector(this.timeSelector).textContent;
+            return parseTimeString(timeString);
+    }
+
+    async seek() {
+    }
+
+    async play() {
+    }
+
+    async pause() {
+    }
+
+    async getVideoId() {
+        return encodeURIComponent(location.href);
+    }
+
+    async getVideoInfo() {
+        return {
+            platform: this.constructor.name.toLowerCase(),
+            id: await this.getVideoId(),
+            offset: 0.0
+        };
+    }
+
+    async checkAd() {
+        return !!document.querySelector(this.adCheckSelector);
+    }
+
+    async checkPlayerReady() {
+        return await this.checkAd(); // only ad check by default
     }
 
     // function to access normal web scope functions using postMessage
@@ -30,7 +76,44 @@ class CommonBase extends EventTarget {
         return promise;
     }
 
-    patchForSandboxEscape(case_statement, init_statement) {
+    patchForSandboxEscape(case_statement, init_statement, {jsVideoId, jsFunctions, jsPlayingStatus}) {
+        const jsFuncs = [];
+
+        if (jsVideoId) {
+            jsFuncs.push("getVideoId");
+        }
+
+        if (jsFunctions) {
+            jsFuncs.push(
+                "getCurrentTime",
+                "seek",
+                "play",
+                "pause"
+            );
+        }
+
+        jsFuncs.forEach(funcName => {
+            this[funcName] = async (...args) => {
+                const res = await this.sandboxEscapeCmd(funcName, args);
+                switch (res.length) {
+                    case 0:
+                        return;
+                    case 1:
+                        return res[0];
+                    default:
+                        return res;
+                }
+            }
+        });
+
+        if (jsPlayingStatus) {
+            this.defaultTimeResult = [true, 0.0];
+            this._loopGetPlayingStatus = async () => {
+                const [paused, time] = await this.sandboxEscapeCmd("getPlayingStatus");
+                return [paused === "true", parseFloat(time)];
+            }
+        }
+
         window.addEventListener("message", (e) => {
             if (this.sandboxEscapeOrigins.includes(e.origin)) {
                 const [prefix, cmd, ...vals] = e.data.split(",");
@@ -50,15 +133,17 @@ class CommonBase extends EventTarget {
 
                 ${init_statement}
 
-                function response(cmd, ...vals) {
-                    window.postMessage(["streamingVideoPartyToolPlatform_sandboxEscape", "result_" + cmd, ...vals].join(","));
-                }
-
                 window.addEventListener("message", (e) => {
+                    let responsed = false;
+                    const response = (cmd, ...vals) => {
+                        window.postMessage(["streamingVideoPartyToolPlatform_sandboxEscape", "result_" + cmd, ...vals].join(","));
+                        responsed = true;
+                    }
                     if (origins.includes(e.origin)) {
                         const [prefix, cmd, ...args] = e.data.split(",");
                         if (prefix === "streamingVideoPartyToolPlatform_sandboxEscape") {
                             ${case_statement}
+                            if (!responsed) response(cmd);
                         }
                     }
                 });
@@ -67,41 +152,55 @@ class CommonBase extends EventTarget {
         document.body.appendChild(scriptNode);
     }
 
+    whenPlayerReady() {
+        return new Promise((resolve, reject) => {
+            const check = async () => {
+                if (await this.checkPlayerReady()) {
+                    resolve();
+                } else {
+                    setTimeout(check, 250);
+                }
+            }
+            check();
+        });
+    }
+
     start() {
         this.interval = setInterval(() => {
             this.loop();
         }, 100);
     }
 
-    checkTimeUpdate(timeString) {
-        if (this.lastTimeString != timeString) {
-            this.lastTimeString = timeString;
-            this.dispatchVideoTimeUpdate(timeString);
-        }
+    async _loopGetPlayingStatus() {
+        return [null, await this.getCurrentTime()];
     }
 
-    loop() {
-        let timeString = "";
-        if (document.querySelector(this.adCheckSelector)) {
-            // in ad
-            timeString = "0:00"
+    async loop() {
+        if (await this.checkPlayerReady()) {
+            this.dispatchVideoPlayingStatus(...await this._loopGetPlayingStatus());
         } else {
-            timeString = document.querySelector(this.timeSelector).textContent;
+            this.dispatchVideoPlayingStatus(...this.defaultTimeResult);
         }
-        this.checkTimeUpdate(timeString);
     }
 
     stop() {
         clearInterval(this.interval);
+        this.interval = null;
     }
 
-    formatTimeString(secs) {
-        const hours = Math.floor(secs / 60 / 60);
-        const minutes = Math.floor(secs / 60) - (hours * 60);
-        const seconds = secs % 60;
+    running() {
+        return this.interval !== null;
+    }
 
-        const formatted = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0');
-        return formatted;
+    parseTimeString(str) {
+        const timeParts = str.split(":");
+        const secPart = timeParts.pop();
+        let secs = parseFloat(secPart);
+        const minPart = timeParts.pop();
+        if (minPart) secs += parseInt(minPart) * 60;
+        const hourPart = timeParts.pop();
+        if (hourPart) secs += parseInt(hourPart) * 60 * 60;
+        return secs;
     }
 }
 

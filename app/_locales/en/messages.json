@@ -23,12 +23,52 @@
     "message": "Show Time Popout",
     "description": ""
   },
+  "popoutRoomServer": {
+    "message": "Room Server",
+    "description": ""
+  },
+  "popoutRoomId": {
+    "message": "Room Id",
+    "description": ""
+  },
+  "popoutRoomKey": {
+    "message": "Room Key",
+    "description": ""
+  },
+  "popoutGenRoomKeyButton": {
+    "message": "Generate Room Key",
+    "description": ""
+  },
+  "popoutHostVideoButtonHost": {
+    "message": "Host Video Party",
+    "description": ""
+  },
+  "popoutHostVideoButtonStop": {
+    "message": "End Video Party",
+    "description": ""
+  },
+  "joinRoomPromptDescription": {
+    "message": "Video party url detected. Would you like to start video party mode?",
+    "description": ""
+  },
+  "joinRoomPromptOk": {
+    "message": "Ok",
+    "description": ""
+  },
+  "joinRoomPromptCancel": {
+    "message": "Cancel",
+    "description": ""
+  },
   "optionsPageTitle": {
     "message": "Options",
     "description": ""
   },
   "optionsVideoTimeCSS": {
     "message": "Custom CSS for Video Time Popout",
+    "description": ""
+  },
+  "optionsRoomServer": {
+    "message": "Default Video Party Server",
     "description": ""
   }
 }

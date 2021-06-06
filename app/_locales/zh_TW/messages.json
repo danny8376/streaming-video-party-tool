@@ -16,11 +16,47 @@
     "description": "The title of the browser action button"
   },
   "popoutTitle": {
-    "message": "時間軸視窗",
+    "message": "同步視聽小工具",
     "description": ""
   },
   "popoutVideoTimeButton": {
     "message": "顯示時間軸視窗",
+    "description": ""
+  },
+  "popoutRoomServer": {
+    "message": "同步伺服器",
+    "description": ""
+  },
+  "popoutRoomId": {
+    "message": "同步編號",
+    "description": ""
+  },
+  "popoutRoomKey": {
+    "message": "主持金鑰",
+    "description": ""
+  },
+  "popoutGenRoomKeyButton": {
+    "message": "生成主持金鑰",
+    "description": ""
+  },
+  "popoutHostVideoButtonHost": {
+    "message": "開始同步視聽",
+    "description": ""
+  },
+  "popoutHostVideoButtonStop": {
+    "message": "結束同步視聽",
+    "description": ""
+  },
+  "joinRoomPromptDescription": {
+    "message": "偵測到同步視聽網址，是否要啟動同步視聽模式?",
+    "description": ""
+  },
+  "joinRoomPromptOk": {
+    "message": "同步視聽",
+    "description": ""
+  },
+  "joinRoomPromptCancel": {
+    "message": "取消",
     "description": ""
   },
   "optionsPageTitle": {
@@ -29,6 +65,10 @@
   },
   "optionsVideoTimeCSS": {
     "message": "時間軸視窗的自訂CSS",
+    "description": ""
+  },
+  "optionsRoomServer": {
+    "message": "預設同步伺服器",
     "description": ""
   }
 }

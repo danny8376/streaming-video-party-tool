@@ -8,5 +8,9 @@
   },
   "devDependencies": {
     "webextension-toolbox": "latest"
+  },
+  "dependencies": {
+    "base58-universal": "^1.0.0",
+    "obs-websocket-js": "^4.0.2"
   }
 }

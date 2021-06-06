@@ -1,29 +1,47 @@
-let platform = null;
-
-function videoTimeUpdate(e) {
-    browser.runtime.sendMessage({
-        event: "videoTimeUpdate",
-        timeString: e.detail.timeString
-    });
+function videoPlayingStatus(e) {
+    browser.runtime.sendMessage(Object.assign({
+        event: "videoPlayingStatus"
+    }, e.detail));
 }
 
 browser.runtime.onMessage.addListener(request => {
+    const platform = window.streamingVideoPartyToolPlatform;
     switch (request.event) {
         case "platformStart":
-            if (!platform) {
-                platform = window.streamingVideoPartyToolPlatform;
+            platform.init();
+            if (!platform.running()) {
                 // last is wantsUntrusted, required for firefox to work
-                platform.addEventListener("videoTimeUpdate", videoTimeUpdate, true, true);
-                platform.start();
+                platform.addEventListener("videoPlayingStatus", videoPlayingStatus, true, true);
+                //platform.whenPlayerReady().then(() => {
+                    platform.start();
+                //});
+
             }
+            platform.getVideoInfo().then((video) => {
+                browser.runtime.sendMessage({
+                    event: "videoInfo",
+                    video
+                });
+            });
             break;
 
         case "platformStop":
-            if (platform) {
-                platform.removeEventListener("videoTimeUpdate", videoTimeUpdate);
+            if (platform.running()) {
+                platform.removeEventListener("videoPlayingStatus", videoTimeUpdate);
                 platform.stop();
-                platform = null;
             }
             break;
     }
 });
+
+try {
+    const params = new URLSearchParams(location.hash.slice(1));
+    const wsUrl = params.get("videopartyroom");
+    if (wsUrl !== null) {
+        browser.runtime.sendMessage({
+            event: "roomDetected",
+            wsUrl
+        });
+    }
+} catch (ex) {
+}

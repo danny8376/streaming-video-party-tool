@@ -5,34 +5,46 @@ class YouTube extends CommonBase {
         super();
         this.sandboxEscapeOrigins = ["https://www.youtube.com"];
         this.adCheckSelector = ".ytp-ad-skip-button";
-        //this.timeSelector = ".ytp-time-current";
     }
 
-    start() {
+    _init() {
         this.patchForSandboxEscape(`
             switch (cmd) {
+                case "getPlayingStatus":
+                    response(cmd,
+                        player.getPlayerState() === 1,
+                        player.getCurrentTime()
+                    );
+                    break;
                 case "getCurrentTime":
-                    const secs = player.getCurrentTime();
-                    response(cmd, secs);
+                    response(cmd, player.getCurrentTime());
+                    break;
+                case "seek":
+                    const [targetSecs] = args;
+                    player.seekTo(targetSecs);
+                    break;
+                case "play":
+                    player.playVideo();
+                    break;
+                case "pause":
+                    player.pauseVideo();
+                    break;
+                case "getPaused":
+                    response(cmd, player.getPlayerState() === 1);
+                    break;
+                case "getVideoId":
+                    response(cmd, ytplayer.config.args.video_id);
                     break;
             }
         `,`
             const player = document.querySelector("#movie_player");
-        `);
+        `, {
+            jsVideoId: true,
+            jsFunctions: true,
+            jsPlayingStatus: true
+        });
 
         super.start();
-    }
-
-    async loop() {
-        let timeString = "";
-        if (document.querySelector(this.adCheckSelector)) {
-            // in ad
-            timeString = "00:00:00"
-        } else {
-            const [secs] = await this.sandboxEscapeCmd("getCurrentTime");
-            timeString = this.formatTimeString(Math.floor(secs));
-        }
-        this.checkTimeUpdate(timeString);
     }
 }
 
