@@ -19,6 +19,10 @@ class AniGamer extends CommonBase {
         return this.playerCanPlay;
     }
 
+    injectControl(dom) {
+        document.querySelector(".videoname").insertAdjacentElement("afterend", dom);
+    }
+
     _init() {
         window.addEventListener("message", async (e) => {
             if (this.sandboxEscapeOrigins.includes(e.origin)) {

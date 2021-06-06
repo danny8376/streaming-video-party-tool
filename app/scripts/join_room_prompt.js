@@ -29,6 +29,69 @@ function setupPrompt(wsUrl) {
     });
 }
 
+let userOffset = 0.0;
+let forceSeek = false;
+
+function injectControl() {
+    const platform = window.streamingVideoPartyToolPlatform;
+
+    const mainContainer = document.createElement("div");
+    mainContainer.className = "streaming-video-party-tool-controls";
+
+    const offsetLabel = document.createElement("lable");
+    offsetLabel.for = "streaming-video-party-tool-controls-offset";
+    offsetLabel.appendChild(document.createTextNode(browser.i18n.getMessage("joinRoomPromptControlOffset")));
+    const offsetSub1s = document.createElement("input");
+    offsetSub1s.type = "button";
+    offsetSub1s.value = "-1";
+    const offsetSub100ms = document.createElement("input");
+    offsetSub100ms.type = "button";
+    offsetSub100ms.value = "-0.1";
+    const offsetSub10ms = document.createElement("input");
+    offsetSub10ms.type = "button";
+    offsetSub10ms.value = "-0.01";
+    const offset = document.createElement("input");
+    offset.type = "number";
+    offset.name = "streaming-video-party-tool-controls-offset";
+    offset.min = -10.0;
+    offset.max = 10.0;
+    offset.step = 0.01;
+    offset.value = 0;
+    const offsetAdd10ms = document.createElement("input");
+    offsetAdd10ms.type = "button";
+    offsetAdd10ms.value = "+0.01";
+    const offsetAdd100ms = document.createElement("input");
+    offsetAdd100ms.type = "button";
+    offsetAdd100ms.value = "+0.1";
+    const offsetAdd1s = document.createElement("input");
+    offsetAdd1s.type = "button";
+    offsetAdd1s.value = "+1";
+
+    const offsetChanged = () => {
+        userOffset = offset.value;
+        forceSeek = true;
+    };
+
+    [offsetSub1s, offsetSub100ms, offsetSub10ms, offsetAdd10ms, offsetAdd100ms, offsetAdd1s].forEach(ele => {
+        const val = parseFloat(ele.value) / offset.step;
+        ele.addEventListener("click", evt => {
+            if (val > 0)
+                offset.stepUp(val);
+            else
+                offset.stepDown(-val);
+            offsetChanged();
+        });
+    });
+
+    offset.addEventListener("change", evt => {
+        offsetChanged();
+    });
+
+    mainContainer.append(offsetLabel, offsetSub1s, offsetSub100ms, offsetSub10ms, offset, offsetAdd10ms, offsetAdd100ms, offsetAdd1s);
+
+    platform.injectControl(mainContainer);
+}
+
 function parseWsMessage(msg) {
     let offset = null;
     if (msg.startsWith("stream_fix#")) {
@@ -41,6 +104,7 @@ function parseWsMessage(msg) {
 function playVideoParty(wsUrl) {
     const platform = window.streamingVideoPartyToolPlatform;
     platform.init();
+    injectControl();
     platform.whenPlayerReady().then(() => {
         const ws = new WebSocket(wsUrl);
         ws.addEventListener("close", (evt) => {
@@ -55,10 +119,12 @@ function playVideoParty(wsUrl) {
                 switch (cmd) {
                     case "sync":
                         platform.getCurrentTime().then(time => {
-                            const [targetTime] = args;
+                            let [targetTime] = args;
+                            targetTime += userOffset; 
                             // we don't seek if offset is within 0.5s
                             // TODO: configurable offset limit
-                            if (Math.abs(targetTime - time) > 0.5) {
+                            if (forceSeek || Math.abs(targetTime - time) > 0.5) {
+                                forceSeek = false;
                                 platform.seek(targetTime);
                             }
                         });

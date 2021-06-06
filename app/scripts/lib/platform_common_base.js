@@ -152,6 +152,9 @@ class CommonBase extends EventTarget {
         document.body.appendChild(scriptNode);
     }
 
+    injectControl(dom) { // per platform
+    }
+
     whenPlayerReady() {
         return new Promise((resolve, reject) => {
             const check = async () => {

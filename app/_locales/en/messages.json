@@ -59,6 +59,10 @@
     "message": "Cancel",
     "description": ""
   },
+  "joinRoomPromptControlOffset": {
+    "message": "Offset",
+    "description": ""
+  },
   "optionsPageTitle": {
     "message": "Options",
     "description": ""

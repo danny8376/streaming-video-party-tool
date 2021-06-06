@@ -59,6 +59,10 @@
     "message": "取消",
     "description": ""
   },
+  "joinRoomPromptControlOffset": {
+    "message": "延遲修正",
+    "description": ""
+  },
   "optionsPageTitle": {
     "message": "選項",
     "description": ""
