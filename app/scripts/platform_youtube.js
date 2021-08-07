@@ -43,8 +43,6 @@ class YouTube extends CommonBase {
             jsFunctions: true,
             jsPlayingStatus: true
         });
-
-        super.start();
     }
 }
 

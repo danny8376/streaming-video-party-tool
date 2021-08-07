@@ -60,7 +60,7 @@ class CommonBase extends EventTarget {
     }
 
     async checkPlayerReady() {
-        return await this.checkAd(); // only ad check by default
+        return !await this.checkAd(); // only ad check by default
     }
 
     // function to access normal web scope functions using postMessage
@@ -115,7 +115,7 @@ class CommonBase extends EventTarget {
         }
 
         window.addEventListener("message", (e) => {
-            if (this.sandboxEscapeOrigins.includes(e.origin)) {
+            if (this.sandboxEscapeOrigins.includes(e.origin) && typeof e.data === "string") {
                 const [prefix, cmd, ...vals] = e.data.split(",");
                 if (prefix === "streamingVideoPartyToolPlatform_sandboxEscape") {
                     if (this.callbacks[cmd]) {
@@ -139,9 +139,9 @@ class CommonBase extends EventTarget {
                         window.postMessage(["streamingVideoPartyToolPlatform_sandboxEscape", "result_" + cmd, ...vals].join(","));
                         responsed = true;
                     }
-                    if (origins.includes(e.origin)) {
+                    if (origins.includes(e.origin) && typeof e.data === "string") {
                         const [prefix, cmd, ...args] = e.data.split(",");
-                        if (prefix === "streamingVideoPartyToolPlatform_sandboxEscape") {
+                        if (prefix === "streamingVideoPartyToolPlatform_sandboxEscape" && !cmd.startsWith("result_")) {
                             ${case_statement}
                             if (!responsed) response(cmd);
                         }
