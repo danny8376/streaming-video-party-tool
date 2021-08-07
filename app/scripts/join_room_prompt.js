@@ -38,7 +38,7 @@ function injectControl() {
     const mainContainer = document.createElement("div");
     mainContainer.className = "streaming-video-party-tool-controls";
 
-    const offsetLabel = document.createElement("lable");
+    const offsetLabel = document.createElement("label");
     offsetLabel.for = "streaming-video-party-tool-controls-offset";
     offsetLabel.appendChild(document.createTextNode(browser.i18n.getMessage("joinRoomPromptControlOffset")));
     const offsetSub1s = document.createElement("input");

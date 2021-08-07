@@ -15,7 +15,6 @@ browser.runtime.onMessage.addListener(request => {
                 //platform.whenPlayerReady().then(() => {
                     platform.start();
                 //});
-
             }
             platform.getVideoInfo().then((video) => {
                 browser.runtime.sendMessage({
