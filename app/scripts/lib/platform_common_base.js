@@ -1,3 +1,5 @@
+import { parseTimeString } from "./time_util";
+
 class CommonBase extends EventTarget {
     constructor() {
         super();
@@ -193,17 +195,6 @@ class CommonBase extends EventTarget {
 
     running() {
         return this.interval !== null;
-    }
-
-    parseTimeString(str) {
-        const timeParts = str.split(":");
-        const secPart = timeParts.pop();
-        let secs = parseFloat(secPart);
-        const minPart = timeParts.pop();
-        if (minPart) secs += parseInt(minPart) * 60;
-        const hourPart = timeParts.pop();
-        if (hourPart) secs += parseInt(hourPart) * 60 * 60;
-        return secs;
     }
 }
 

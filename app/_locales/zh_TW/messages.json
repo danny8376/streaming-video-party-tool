@@ -47,6 +47,10 @@
     "message": "結束同步視聽",
     "description": ""
   },
+  "popoutAutoStreamOffset": {
+    "message": "自動修正直播延遲(需要 OBS-Websocket )",
+    "description": ""
+  },
   "joinRoomPromptDescription": {
     "message": "偵測到同步視聽網址，是否要啟動同步視聽模式?",
     "description": ""
@@ -73,6 +77,14 @@
   },
   "optionsRoomServer": {
     "message": "預設同步伺服器",
+    "description": ""
+  },
+  "optionsObsWebsocketUrl": {
+    "message": "OBS Websocket 網址",
+    "description": ""
+  },
+  "optionsObsWebsocketPass": {
+    "message": "OBS Websocket 密碼",
     "description": ""
   }
 }

@@ -22,9 +22,22 @@
   <input id="genRoomKey" type="button" value="__MSG_popoutGenRoomKeyButton__">
   <br>
   <input id="hostVideo" type="button" value="__MSG_popoutHostVideoButtonHost__">
-
-
+  <br>
+  <input id="autoStreamOffset" name="autoStreamOffset" type="checkbox">
+  <label for="autoStreamOffset">__MSG_popoutAutoStreamOffset__</label>
+  <div class="manual-stream-offset-container">
+    <label for="manualStreamOffset">__MSG_popoutManualStreamOffset__</label>
+    <input type="button" value="-1">
+    <input type="button" value="-0.1">
+    <input type="button" value="-0.01">
+    <input id="manualStreamOffset" name="manualStreamOffset" class="html-duration-picker" style="width: 8em;">
+    <span id="manualStreamOffsetMS">.00</span>
+    <input type="button" value="+0.01">
+    <input type="button" value="+0.1">
+    <input type="button" value="+1">
+  </div>
 
   <script src="../scripts/popup.js"></script>
+  <script src="../scripts/html-duration-picker.min.js"></script>
 </body>
 </html>

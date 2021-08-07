@@ -1,15 +1,8 @@
+import { formatTimeString } from "./lib/time_util";
+
 const timer = document.querySelector("#timer");
 
 let lastTime = "";
-
-function formatTimeString(secs) {
-    const hours = Math.floor(secs / 60 / 60);
-    const minutes = Math.floor(secs / 60) - (hours * 60);
-    const seconds = secs % 60;
-
-    const formatted = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0');
-    return formatted;
-}
 
 async function applyCSS(val) {
     val = val || (await browser.storage.local.get("videoTimeCSS")).videoTimeCSS

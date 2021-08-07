@@ -3,7 +3,7 @@ import { validateWSURL } from "./lib/validate_ws_url";
 
 localizeHtmlPage();
 
-const keys = ["videoTimeCSS", "roomServer"];
+const keys = ["videoTimeCSS", "roomServer", "obsWebsocketUrl", "obsWebsocketPass"];
 const validators = {
     roomServer(value) {
         if (validateWSURL(value)) {

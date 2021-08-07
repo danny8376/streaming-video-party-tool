@@ -47,6 +47,10 @@
     "message": "End Video Party",
     "description": ""
   },
+  "popoutAutoStreamOffset": {
+    "message": "Auto Stream Offset (Require OBS-Websocket)",
+    "description": ""
+  },
   "joinRoomPromptDescription": {
     "message": "Video party url detected. Would you like to start video party mode?",
     "description": ""
@@ -73,6 +77,14 @@
   },
   "optionsRoomServer": {
     "message": "Default Video Party Server",
+    "description": ""
+  },
+  "optionsObsWebsocketUrl": {
+    "message": "OBS Websocket URL",
+    "description": ""
+  },
+  "optionsObsWebsocketPass": {
+    "message": "OBS Websocket Password",
     "description": ""
   }
 }

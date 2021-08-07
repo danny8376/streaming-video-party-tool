@@ -1,4 +1,6 @@
 import { supportedHostnames } from "./lib/supported_hostnames.js";
+import { parseTimeString } from "./lib/time_util";
+import { default as OBSWebSocket } from "obs-websocket-js";
 
 browser.runtime.onInstalled.addListener((details) => {
   console.log('previousVersion', details.previousVersion);
@@ -7,6 +9,14 @@ browser.runtime.onInstalled.addListener((details) => {
 let videoTimeWindow = null;
 let hostWS = null;
 let clientWSs = {};
+let obs = null;
+let autoStreamOffset = true;
+
+const streamOffset = {
+    offset: 0.0,
+    counter: 0,
+    interval: null
+};
 
 function platformStop() {
     if (videoTimeWindow.targetTabId) {
@@ -14,6 +24,60 @@ function platformStop() {
             event: "platformStop"
         });
         videoTimeWindow.targetTabId = null;
+    }
+}
+
+function startCountingOffset() {
+    if (streamOffset.interval !== null) return;
+
+    if (hostWS) hostWS.send("stream,?,?,0.0");
+    streamOffset.counter = performance.now();
+    streamOffset.interval = setInterval(() => {
+        const counter = performance.now();
+        const timePassed = counter - streamOffset.counter;
+        streamOffset.counter = counter;
+        streamOffset.offset += timePassed / 1000;
+
+        if (hostWS) hostWS.send(`stream_sync,${streamOffset.offset}`);
+
+        browser.runtime.sendMessage({
+            event: "renderStreamOffset",
+            offset: streamOffset.offset
+        });
+    }, 123);
+}
+
+function stopCountingOffset() {
+    if (streamOffset.interval === null) return;
+
+    clearInterval(streamOffset.interval);
+    streamOffset.interval = null;
+}
+
+function ensureOBS() {
+    if (obs) {
+        obs.send('GetStreamingStatus').then(({streamTimecode: timecode}) => {
+            streamOffset.offset = parseTimeString(timecode);
+            startCountingOffset();
+        });
+    } else {
+        browser.storage.local.get(["obsWebsocketUrl", "obsWebsocketPass"]).then(({obsWebsocketUrl, obsWebsocketPass}) => {
+            const address = obsWebsocketUrl || "localhost:4444";
+            const password = obsWebsocketPass || "";
+            obs = new OBSWebSocket();
+            obs.connect({address, password}).then(() => {
+                obs.send('GetStreamingStatus').then(({streamTimecode: timecode}) => {
+                    streamOffset.offset = parseTimeString(timecode);
+                    startCountingOffset();
+                });
+            });
+            obs.on("StreamStatus", ({totalStreamTime: sec, streamTimecode: timecode}) => {
+                if (autoStreamOffset) {
+                    const ms = timecode.slice(timecode.lastIndexOf("."));
+                    streamOffset.offset = sec + parseFloat(ms);
+                }
+            });
+        });
     }
 }
 
@@ -106,6 +170,11 @@ browser.runtime.onMessage.addListener((request, sender) => {
                 hostWS.heartbeat = setInterval(() => {
                     hostWS.send("heartbeat");
                 }, 45000);
+                if (autoStreamOffset = request.autoStreamOffset) {
+                    ensureOBS();
+                } else {
+                    startCountingOffset();
+                }
             });
             hostWS.addEventListener("close", (evt) => {
                 clearInterval(hostWS.heartbeat);
@@ -125,7 +194,19 @@ browser.runtime.onMessage.addListener((request, sender) => {
             });
             break;
         case "endHostVideo":
+            stopCountingOffset();
             hostWS.send("close");
+            break;
+        case "updateManualStreamOffset":
+            streamOffset.offset = request.offset;
+            break;
+        case "renderStreamOffset": // dummy
+            break;
+        case "forceRenderStreamOffset":
+            browser.runtime.sendMessage({
+                event: "renderStreamOffset",
+                offset: streamOffset.offset
+            });
             break;
         case "roomDetected":
             try {
