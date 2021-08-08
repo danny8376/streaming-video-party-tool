@@ -129,6 +129,14 @@ browser.runtime.onMessage.addListener((request, sender) => {
             platformStart();
             break;
         case "jumpToTab":
+            browser.tabs.update(targetTabId, {
+                active: true
+            });
+            browser.tabs.get(targetTabId).then((tab) => {
+                browser.windows.update(tab.windowId, {
+                    focused: true
+                });
+            });
             break;
         case "popoutVideoTime":
             // if there's no monitoring tab => monitor current tab
