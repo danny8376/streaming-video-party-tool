@@ -19,15 +19,23 @@
     "message": "Video Time Popout",
     "description": ""
   },
-  "popoutStatusIdle": {
+  "popoutSelectViewingSide": {
+    "message": "Viewing",
+    "description": ""
+  },
+  "popoutSelectHostingSide": {
+    "message": "Hosting",
+    "description": ""
+  },
+  "popoutHostStatusIdle": {
     "message": "Idle",
     "description": ""
   },
-  "popoutStatusHosting": {
+  "popoutHostStatusHosting": {
     "message": "Hosting: ",
     "description": ""
   },
-  "popoutStatusHostingCurrent": {
+  "popoutHostStatusHostingCurrent": {
     "message": "Hosting: Current Tab",
     "description": ""
   },
@@ -73,6 +81,14 @@
   },
   "popoutAutoStreamOffset": {
     "message": "Auto Stream Offset (Require OBS-Websocket)",
+    "description": ""
+  },
+  "popoutStreamOffsetVideoPlatform": {
+    "message": "Offset Video Platform",
+    "description": ""
+  },
+  "popoutStreamOffsetVideoId": {
+    "message": "Offset Video Id",
     "description": ""
   },
   "joinRoomPromptDescription": {

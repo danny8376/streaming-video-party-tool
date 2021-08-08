@@ -9,40 +9,59 @@
 
   <h1>__MSG_popoutTitle__</h1>
 
-  <p><span id="status">__MSG_popoutStatusIdle__</span></p>
-  <input id="hostTab" type="button" value="__MSG_popoutSwitchTabButtonHost__">
-  <input id="jumpToTab" type="button" value="__MSG_popoutJumpToTabButton__" disabled>
+  <nav>
+    <input id="selectViewingSide" type="button" value="__MSG_popoutSelectViewingSide__">
+    <input id="selectHostingSide" type="button" value="__MSG_popoutSelectHostingSide__" disabled>
+  </nav>
 
   <hr>
 
-  <input id="popoutVideoTime" type="button" value="__MSG_popoutVideoTimeButton__">
+  <div id="viewingSide" style="display: none;">
+  </div>
 
-  <hr>
+  <div id="hostingSide">
+    <p><span id="hostStatus">__MSG_popoutHostStatusIdle__</span></p>
+    <input id="hostTab" type="button" value="__MSG_popoutSwitchTabButtonHost__">
+    <input id="jumpToTab" type="button" value="__MSG_popoutJumpToTabButton__" disabled>
 
-  <label for="roomServer">__MSG_popoutRoomServer__</label>
-  <input id="roomServer" name="roomServer" type="text">
-  <br>
-  <label for="roomId">__MSG_popoutRoomId__</label>
-  <input id="roomId" name="roomId" type="text" readonly>
-  <br>
-  <label for="roomKey">__MSG_popoutRoomKey__</label>
-  <input id="roomKey" name="roomKey" type="text">
-  <br>
-  <input id="genRoomKey" type="button" value="__MSG_popoutGenRoomKeyButton__">
-  <input id="hostVideo" type="button" value="__MSG_popoutHostVideoButtonHost__">
-  <br>
-  <input id="autoStreamOffset" name="autoStreamOffset" type="checkbox">
-  <label for="autoStreamOffset">__MSG_popoutAutoStreamOffset__</label>
-  <div class="manual-stream-offset-container">
-    <label for="manualStreamOffset">__MSG_popoutManualStreamOffset__</label>
-    <input type="button" value="-1">
-    <input type="button" value="-0.1">
-    <input type="button" value="-0.01">
-    <input id="manualStreamOffset" name="manualStreamOffset" class="html-duration-picker" style="width: 8em;">
-    <span id="manualStreamOffsetMS">.00</span>
-    <input type="button" value="+0.01">
-    <input type="button" value="+0.1">
-    <input type="button" value="+1">
+    <hr>
+
+    <input id="popoutVideoTime" type="button" value="__MSG_popoutVideoTimeButton__">
+
+    <hr>
+
+    <label for="roomServer">__MSG_popoutRoomServer__</label>
+    <input id="roomServer" name="roomServer" type="text">
+    <br>
+    <label for="roomId">__MSG_popoutRoomId__</label>
+    <input id="roomId" name="roomId" type="text" readonly>
+    <br>
+    <label for="roomKey">__MSG_popoutRoomKey__</label>
+    <input id="roomKey" name="roomKey" type="text">
+    <br>
+    <input id="genRoomKey" type="button" value="__MSG_popoutGenRoomKeyButton__">
+    <input id="hostVideo" type="button" value="__MSG_popoutHostVideoButtonHost__">
+    <br>
+    <input id="autoStreamOffset" name="autoStreamOffset" type="checkbox">
+    <label for="autoStreamOffset">__MSG_popoutAutoStreamOffset__</label>
+    <div class="manual-stream-offset-container">
+      <label for="manualStreamOffset">__MSG_popoutManualStreamOffset__</label>
+      <input type="button" value="-1">
+      <input type="button" value="-0.1">
+      <input type="button" value="-0.01">
+      <input id="manualStreamOffset" name="manualStreamOffset" class="html-duration-picker" style="width: 8em;">
+      <span id="manualStreamOffsetMS">.000</span>
+      <input type="button" value="+0.01">
+      <input type="button" value="+0.1">
+      <input type="button" value="+1">
+    </div>
+    <label for="streamOffsetVideoPlatform">__MSG_popoutStreamOffsetVideoPlatform__</label>
+    <select id="streamOffsetVideoPlatform" name="streamOffsetVideoPlatform">
+      <option value="youtube">YouTube</option>
+    </select>
+    <br>
+    <label for="streamOffsetVideoId">__MSG_popoutStreamOffsetVideoId__</label>
+    <input id="streamOffsetVideoId" name="streamOffsetVideoId" type="text">
   </div>
 
   <script src="../scripts/popup.js"></script>

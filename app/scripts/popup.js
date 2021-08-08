@@ -11,8 +11,29 @@ let supportedPage = false;
 let blockTimeUpdate = false;
 let lastStreamOffsetValue = "";
 
+const sides = ["Viewing", "Hosting"];
 const doms = {};
-["status", "hostTab", "jumpToTab", "popoutVideoTime", "roomServer", "roomKey", "roomId", "genRoomKey", "hostVideo", "autoStreamOffset", "manualStreamOffset", "manualStreamOffsetMS"].forEach(id => doms[id] = document.querySelector(`#${id}`));
+const domSideControls = [...sides.map(side => `select${side}Side`), ...sides.map(side => `${side.toLowerCase()}Side`)];
+const domViewingControls = [];
+const domHostingControls = ["hostStatus", "hostTab", "jumpToTab", "popoutVideoTime", "roomServer", "roomKey", "roomId", "genRoomKey", "hostVideo", "autoStreamOffset", "manualStreamOffset", "manualStreamOffsetMS", "streamOffsetVideoPlatform", "streamOffsetVideoId"];
+[...domSideControls, ...domViewingControls, ...domHostingControls].forEach(id => doms[id] = document.querySelector(`#${id}`));
+
+function switchSide(target) {
+    sides.forEach(side => {
+        if (side === target) {
+            doms[`${side.toLowerCase()}Side`].style.display = "block";
+            doms[`select${side}Side`].disabled = true;
+        } else {
+            doms[`${side.toLowerCase()}Side`].style.display = "none";
+            doms[`select${side}Side`].disabled = false;
+        }
+    });
+}
+sides.forEach(side => {
+    doms[`select${side}Side`].addEventListener("click", evt => {
+        switchSide(side);
+    });
+});
 
 browser.storage.local.get(["roomKey", "autoStreamOffset", "streamOffset"]).then(({roomKey, autoStreamOffset, streamOffset}) => {
     doms.roomKey.value = roomKey;
@@ -34,19 +55,19 @@ function updateStatus() {
                 if (targetTabId === tab.id) {
                     doms.hostTab.disabled = true;
                     doms.jumpToTab.disabled = true;
-                    doms.status.firstChild.replaceWith(browser.i18n.getMessage("popoutStatusHostingCurrent"));
+                    doms.hostStatus.firstChild.replaceWith(browser.i18n.getMessage("popoutHostStatusHostingCurrent"));
                 } else {
                     doms.hostTab.disabled = false;
                     doms.jumpToTab.disabled = false;
                     browser.tabs.get(targetTabId).then(targetTab => {
-                        doms.status.firstChild.replaceWith(browser.i18n.getMessage("popoutStatusHosting") + targetTab.title);
+                        doms.hostStatus.firstChild.replaceWith(browser.i18n.getMessage("popoutHostStatusHosting") + targetTab.title);
                     });
                 }
             } else {
                 doms.hostTab.value = browser.i18n.getMessage("popoutHostTabButtonHost");
                 doms.hostTab.disabled = false;
                 doms.jumpToTab.disabled = true;
-                doms.status.firstChild.replaceWith(browser.i18n.getMessage("popoutStatusIdle"));
+                doms.hostStatus.firstChild.replaceWith(browser.i18n.getMessage("popoutHostStatusIdle"));
             }
         });
     });
@@ -76,6 +97,8 @@ function updateHostVideoButton(hosting, supported) {
         doms.genRoomKey.disabled = true;
         doms.roomKey.readOnly = true;
         doms.autoStreamOffset.disabled = true;
+        doms.streamOffsetVideoPlatform.disabled = true;
+        doms.streamOffsetVideoId.disabled = true;
     } else { // not hosting => start button => disable when non-supported page
         btn.disabled = !supported;
         btn.value = browser.i18n.getMessage("popoutHostVideoButtonHost")
@@ -83,6 +106,8 @@ function updateHostVideoButton(hosting, supported) {
         doms.genRoomKey.disabled = false;
         doms.roomKey.readOnly = false;
         doms.autoStreamOffset.disabled = false;
+        doms.streamOffsetVideoPlatform.disabled = false;
+        doms.streamOffsetVideoId.disabled = false;
     }
 }
 
@@ -236,7 +261,11 @@ doms.hostVideo.addEventListener("click", async (evt) => {
                         url: `${wsUrl}ws/party-host/${roomId}`,
                         key: roomKey
                     },
-                    autoStreamOffset: doms.autoStreamOffset.checked
+                    autoStreamOffset: doms.autoStreamOffset.checked,
+                    streamOffsetVideo: {
+                        platform: doms.streamOffsetVideoPlatform.value,
+                        id: doms.streamOffsetVideoId.value
+                    }
                 });
                 updateHostVideoButton(true);
         }

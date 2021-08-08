@@ -1,3 +1,19 @@
+body {
+    min-width: 30em;
+}
+
+nav + hr {
+    margin-top: 0;
+    width: 140%;
+    margin-left: -20%;
+}
+
+.manual-stream-offset-container input[type=button] {
+    font-size: 0.75em;
+    padding: 0.25em 0;
+    min-width: 2.5em;
+}
+
 #manualStreamOffsetMS {
     font-size: 0.75em;
 }

@@ -19,15 +19,23 @@
     "message": "同步視聽小工具",
     "description": ""
   },
-  "popoutStatusIdle": {
+  "popoutSelectViewingSide": {
+    "message": "觀眾",
+    "description": ""
+  },
+  "popoutSelectHostingSide": {
+    "message": "主持",
+    "description": ""
+  },
+  "popoutHostStatusIdle": {
     "message": "閒置中",
     "description": ""
   },
-  "popoutStatusHosting": {
+  "popoutHostStatusHosting": {
     "message": "分享中分頁: ",
     "description": ""
   },
-  "popoutStatusHostingCurrent": {
+  "popoutHostStatusHostingCurrent": {
     "message": "分享目前分頁中",
     "description": ""
   },
@@ -73,6 +81,14 @@
   },
   "popoutAutoStreamOffset": {
     "message": "自動修正直播延遲(需要 OBS-Websocket )",
+    "description": ""
+  },
+  "popoutStreamOffsetVideoPlatform": {
+    "message": "延遲參照影片平台",
+    "description": ""
+  },
+  "popoutStreamOffsetVideoId": {
+    "message": "延遲參照影片ID",
     "description": ""
   },
   "joinRoomPromptDescription": {

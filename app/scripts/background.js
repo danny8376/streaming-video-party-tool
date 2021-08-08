@@ -215,10 +215,18 @@ browser.runtime.onMessage.addListener((request, sender) => {
                 hostWS.heartbeat = setInterval(() => {
                     hostWS.send("heartbeat");
                 }, 45000);
-                if (autoStreamOffset = request.autoStreamOffset) {
-                    ensureOBS();
-                } else if (streamOffset.offset !== 0.0) { // 0 means disable stream fix
-                    startCountingOffset();
+
+                // stream offset video set => enable stream offset fix
+                if (request.streamOffsetVideo.id) {
+                    const {platform, id} = request.streamOffsetVideo;
+                    hostWS.send(`stream,${platform},${id.replace(/[^a-zA-Z0-9_-]/g, "")},0.0`);
+
+                    autoStreamOffset = request.autoStreamOffset;
+                    if (autoStreamOffset) {
+                        ensureOBS();
+                    } else {
+                        startCountingOffset();
+                    }
                 }
             });
             hostWS.addEventListener("close", (evt) => {
