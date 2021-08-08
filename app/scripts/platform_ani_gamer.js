@@ -63,6 +63,9 @@ class AniGamer extends CommonBase {
             }
         `,`
             const player = videojs("ani_video");
+            if (player.readyState() !== 0) { // already ready
+                window.postMessage("streamingVideoPartyToolPlatform_AniGamer_canplay");
+            }
             player.on("loadeddata", () => {
                 window.postMessage("streamingVideoPartyToolPlatform_AniGamer_canplay");
             });

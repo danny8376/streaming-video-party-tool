@@ -12,7 +12,7 @@ class YouTube extends CommonBase {
             switch (cmd) {
                 case "getPlayingStatus":
                     response(cmd,
-                        player.getPlayerState() === 1,
+                        player.getPlayerState() !== 1,
                         player.getCurrentTime()
                     );
                     break;
@@ -30,7 +30,7 @@ class YouTube extends CommonBase {
                     player.pauseVideo();
                     break;
                 case "getPaused":
-                    response(cmd, player.getPlayerState() === 1);
+                    response(cmd, player.getPlayerState() !== 1);
                     break;
                 case "getVideoId":
                     response(cmd, ytplayer.config.args.video_id);
