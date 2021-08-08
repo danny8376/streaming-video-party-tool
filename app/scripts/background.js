@@ -63,7 +63,6 @@ function platformStop(tabId) {
 function startCountingOffset() {
     if (streamOffset.interval !== null) return;
 
-    if (hostWS) hostWS.send("stream,?,?,0.0");
     streamOffset.counter = performance.now();
     streamOffset.interval = setInterval(() => {
         const counter = performance.now();
