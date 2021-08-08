@@ -33,7 +33,7 @@ class YouTube extends CommonBase {
                     response(cmd, player.getPlayerState() !== 1);
                     break;
                 case "getVideoId":
-                    response(cmd, ytplayer.config.args.video_id);
+                    response(cmd, player.getVideoData().video_id);
                     break;
             }
         `,`
