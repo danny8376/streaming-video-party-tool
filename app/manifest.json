@@ -20,7 +20,7 @@
     "browser_style": true
   },
   "permissions": [
-    "*://video-party.saru.moe/party.html*",
+    "*://video-party.saru.moe/room.html*",
     "*://ani.gamer.com.tw/animeVideo.php*",
     "*://www.youtube.com/watch*",
     "*://www.youtube.com/embed/*",
@@ -37,7 +37,7 @@
   "content_scripts": [
     {
       "matches": [
-        "*://video-party.saru.moe/party.html*"
+        "*://video-party.saru.moe/room.html*"
       ],
       "js": [
         "scripts/platform_party_dummy.js",
