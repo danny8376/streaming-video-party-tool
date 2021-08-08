@@ -127,9 +127,9 @@ async function playVideoParty(wsUrl) {
         });
         ws.addEventListener("message", (evt) => {
             const [offset, cmd, args] = parseWsMessage(evt.data);
-            if (offset !== null) {
+            //if (offset !== null) {
                 // TODO: stream fix mode
-            } else {
+            //} else {
                 switch (cmd) {
                     case "video":
                         const [videoPlatform, videoId, starttime] = args;
@@ -159,7 +159,7 @@ async function playVideoParty(wsUrl) {
                         platform.pause();
                         break;
                 }
-            }
+            //}
         });
     });
 }
