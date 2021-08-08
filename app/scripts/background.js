@@ -207,7 +207,7 @@ browser.runtime.onMessage.addListener((request, sender) => {
                 }, 45000);
                 if (autoStreamOffset = request.autoStreamOffset) {
                     ensureOBS();
-                } else {
+                } else if (streamOffset.offset !== 0.0) { // 0 means disable stream fix
                     startCountingOffset();
                 }
             });
@@ -220,8 +220,11 @@ browser.runtime.onMessage.addListener((request, sender) => {
                 console.log(evt.data)
             });
 
+            // if there's monitoring tab => platformStart to send video info (already prevent re-initing)
             // if there's no monitoring tab => monitor current tab
-            if (!targetTabId) platformStart();
+            if (targetTabId) platformStart(targetTabId);
+            else platformStart();
+
             break;
         case "endHostVideo":
             stopCountingOffset();
