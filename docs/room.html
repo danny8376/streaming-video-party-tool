@@ -21,8 +21,25 @@
   </ul>
 
   <script>
+    // short uri check & redirection
     if (location.search && !location.hash) {
       location.href = "https://video-party.saru.moe/room#videopartyroom=wss%3A%2F%2Fvideo-party.test-endpoint.lan%2Fws%2Froom%2F" + location.search.slice(1);
+    }
+
+    // ext check
+    if (!window.streamingVideoPartyToolPlatform_ext_exist) {
+      // wait 1.5s for checking ?
+      window.noExtTimeout = setTimeout(() => runNoExt(), 1500);
+      window.streamingVideoPartyToolPlatform_mark_ext_exist = () => {
+        clearTimeout(window.noExtTimeout);
+        delete window.noExtTimeout;
+      };
+      window.streamingVideoPartyToolPlatform_dummy_web_inited = true
+    }
+
+    // no ext
+    function runNoExt() {
+      console.log("No EXT installed");
     }
   </script>
 </body>
