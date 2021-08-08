@@ -20,6 +20,7 @@
     "browser_style": true
   },
   "permissions": [
+    "*://video-party.saru.moe/party.html*",
     "*://ani.gamer.com.tw/animeVideo.php*",
     "*://www.youtube.com/watch*",
     "*://www.youtube.com/embed/*",
@@ -34,6 +35,17 @@
     "default_popup": "pages/popup.html"
   },
   "content_scripts": [
+    {
+      "matches": [
+        "*://video-party.saru.moe/party.html*"
+      ],
+      "js": [
+        "scripts/platform_party_dummy.js",
+        "scripts/contentscript.js"
+      ],
+      "run_at": "document_end",
+      "all_frames": false
+    },
     {
       "matches": [
         "*://ani.gamer.com.tw/animeVideo.php*"
