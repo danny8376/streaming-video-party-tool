@@ -26,7 +26,7 @@ browser.runtime.onMessage.addListener(request => {
 
         case "platformStop":
             if (platform.running()) {
-                platform.removeEventListener("videoPlayingStatus", videoTimeUpdate);
+                platform.removeEventListener("videoPlayingStatus", videoPlayingStatus);
                 platform.stop();
             }
             break;

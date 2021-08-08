@@ -19,6 +19,30 @@
     "message": "同步視聽小工具",
     "description": ""
   },
+  "popoutStatusIdle": {
+    "message": "閒置中",
+    "description": ""
+  },
+  "popoutStatusHosting": {
+    "message": "分享中分頁: ",
+    "description": ""
+  },
+  "popoutStatusHostingCurrent": {
+    "message": "分享目前分頁中",
+    "description": ""
+  },
+  "popoutHostTabButtonHost": {
+    "message": "使用目前分頁",
+    "description": ""
+  },
+  "popoutHostTabButtonSwitch": {
+    "message": "使用目前分頁",
+    "description": ""
+  },
+  "popoutJumpToTabButton": {
+    "message": "跳至影片分頁",
+    "description": ""
+  },
   "popoutVideoTimeButton": {
     "message": "顯示時間軸視窗",
     "description": ""

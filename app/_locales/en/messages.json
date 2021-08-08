@@ -19,6 +19,30 @@
     "message": "Video Time Popout",
     "description": ""
   },
+  "popoutStatusIdle": {
+    "message": "Idle",
+    "description": ""
+  },
+  "popoutStatusHosting": {
+    "message": "Hosting: ",
+    "description": ""
+  },
+  "popoutStatusHostingCurrent": {
+    "message": "Hosting: Current Tab",
+    "description": ""
+  },
+  "popoutHostTabButtonHost": {
+    "message": "Host This Tab",
+    "description": ""
+  },
+  "popoutHostTabButtonSwitch": {
+    "message": "Switch Hosting Tab",
+    "description": ""
+  },
+  "popoutJumpToTabButton": {
+    "message": "Jump to Hosting Tab",
+    "description": ""
+  },
   "popoutVideoTimeButton": {
     "message": "Show Time Popout",
     "description": ""

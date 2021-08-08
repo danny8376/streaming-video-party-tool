@@ -12,7 +12,7 @@ let blockTimeUpdate = false;
 let lastStreamOffsetValue = "";
 
 const doms = {};
-["popoutVideoTime", "roomServer", "roomKey", "roomId", "genRoomKey", "hostVideo", "autoStreamOffset", "manualStreamOffset", "manualStreamOffsetMS"].forEach(id => doms[id] = document.querySelector(`#${id}`));
+["status", "hostTab", "jumpToTab", "popoutVideoTime", "roomServer", "roomKey", "roomId", "genRoomKey", "hostVideo", "autoStreamOffset", "manualStreamOffset", "manualStreamOffsetMS"].forEach(id => doms[id] = document.querySelector(`#${id}`));
 
 browser.storage.local.get(["roomKey", "autoStreamOffset", "streamOffset"]).then(({roomKey, autoStreamOffset, streamOffset}) => {
     doms.roomKey.value = roomKey;
@@ -21,6 +21,44 @@ browser.storage.local.get(["roomKey", "autoStreamOffset", "streamOffset"]).then(
     if (typeof autoStreamOffset === "undefined") autoStreamOffset = true;
     doms.autoStreamOffset.checked = autoStreamOffset;
     updateStreamOffsetEditable(autoStreamOffset);
+});
+
+function updateStatus() {
+    browser.runtime.sendMessage({event: "retrieveMonitoringTab"}).then((targetTabId) => {
+        browser.tabs.query({
+            currentWindow: true,
+            active: true
+        }).then(([tab]) => {
+            if (targetTabId) {
+                doms.hostTab.value = browser.i18n.getMessage("popoutHostTabButtonSwitch");
+                if (targetTabId === tab.id) {
+                    doms.hostTab.disabled = true;
+                    doms.jumpToTab.disabled = true;
+                    doms.status.firstChild.replaceWith(browser.i18n.getMessage("popoutStatusHostingCurrent"));
+                } else {
+                    doms.hostTab.disabled = false;
+                    doms.jumpToTab.disabled = false;
+                    browser.tabs.get(targetTabId).then(targetTab => {
+                        doms.status.firstChild.replaceWith(browser.i18n.getMessage("popoutStatusHosting") + targetTab.title);
+                    });
+                }
+            } else {
+                doms.hostTab.value = browser.i18n.getMessage("popoutHostTabButtonHost");
+                doms.hostTab.disabled = false;
+                doms.jumpToTab.disabled = true;
+                doms.status.firstChild.replaceWith(browser.i18n.getMessage("popoutStatusIdle"));
+            }
+        });
+    });
+}
+updateStatus();
+
+doms.hostTab.addEventListener("click", evt => {
+    browser.runtime.sendMessage({event: "hostTab"});
+});
+
+doms.jumpToTab.addEventListener("click", evt => {
+    browser.runtime.sendMessage({event: "jumpToTab"});
 });
 
 doms.popoutVideoTime.addEventListener("click", () => {
@@ -33,7 +71,7 @@ function updateHostVideoButton(hosting, supported) {
     btn.setAttribute("data-hosting", hosting);
     if (hosting) { // hosting => always show stop button
         btn.disabled = false;
-        btn.value = browser.i18n.getMessage("popoutHostVideoButtonStop")
+        btn.value = browser.i18n.getMessage("popoutHostVideoButtonStop");
         doms.roomServer.readOnly = true;
         doms.genRoomKey.disabled = true;
         doms.roomKey.readOnly = true;
@@ -207,6 +245,9 @@ doms.hostVideo.addEventListener("click", async (evt) => {
 
 browser.runtime.onMessage.addListener((request, sender) => {
     switch (request.event) {
+        case "refreshPopoutStatus":
+            updateStatus();
+            break;
         case "renderStreamOffset":
             if (!blockTimeUpdate) {
                 const secs = Math.floor(request.offset);

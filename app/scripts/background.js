@@ -6,6 +6,7 @@ browser.runtime.onInstalled.addListener((details) => {
   console.log('previousVersion', details.previousVersion);
 });
 
+let targetTabId = null;
 let videoTimeWindow = null;
 let hostWS = null;
 let clientWSs = {};
@@ -18,12 +19,44 @@ const streamOffset = {
     interval: null
 };
 
-function platformStop() {
-    if (videoTimeWindow.targetTabId) {
-        browser.tabs.sendMessage(videoTimeWindow.targetTabId, {
+function platformStart(tabId) {
+    if (tabId) {
+        if (targetTabId !== null) { // if there's monitoring tab
+            if (targetTabId !== tabId) {
+                platformStop(targetTabId);
+            }
+        }
+        targetTabId = tabId;
+        browser.tabs.sendMessage(tabId, {
+            event: "platformStart"
+        });
+        browser.runtime.sendMessage({
+            event: "updateTargetTabId",
+            tabId: targetTabId
+        });
+        browser.runtime.sendMessage({
+            event: "refreshPopoutStatus"
+        });
+    } else {
+        browser.tabs.query({
+            currentWindow: true,
+            active: true
+        }).then(([tab]) => {
+            const tabUrl = new URL(tab.url);
+            if (supportedHostnames.includes(tabUrl.hostname)) {
+                platformStart(tab.id);
+            }
+        });
+    }
+}
+
+function platformStop(tabId) {
+    tabId = tabId || targetTabId;
+    if (tabId) {
+        browser.tabs.sendMessage(tabId, {
             event: "platformStop"
         });
-        videoTimeWindow.targetTabId = null;
+        if (tabId === targetTabId) targetTabId = null;
     }
 }
 
@@ -82,33 +115,35 @@ function ensureOBS() {
 }
 
 browser.runtime.onMessage.addListener((request, sender) => {
+    // block any non-target tab messages
+    if (sender.tab && sender.tab.id !== targetTabId) return;
     switch (request.event) {
+        case "retrieveMonitoringTab":
+            return new Promise((resolve, reject) => resolve(targetTabId));
+            break;
+        case "refreshPopoutStatus": // dummy
+            break;
+        case "hostTab":
+            platformStart();
+            break;
+        case "jumpToTab":
+            break;
         case "popoutVideoTime":
-            browser.tabs.query({
-                currentWindow: true,
-                active: true
-            }).then(async ([tab]) => {
-                const tabUrl = new URL(tab.url);
-                if (supportedHostnames.includes(tabUrl.hostname)) {
-                    if (videoTimeWindow) {
-                        if (videoTimeWindow.targetTabId) platformStop();
-                    } else {
-                        videoTimeWindow = await browser.windows.create({
-                            //allowScriptsToClose: true,
-                            type: "popup",
-                            url: "pages/video_time.html",
-                            width: 640,
-                            height: 240
-                        });
-                    }
+            // if there's no monitoring tab => monitor current tab
+            if (!targetTabId) platformStart();
+            // !!! must monitor before create window, or it's catch new window as target tab !!!
 
-                    videoTimeWindow.targetTabId = tab.id;
-
-                    browser.tabs.sendMessage(videoTimeWindow.targetTabId, {
-                        event: "platformStart"
-                    });
-                }
-            });
+            if (!videoTimeWindow) {
+                browser.windows.create({
+                    //allowScriptsToClose: true,
+                    type: "popup",
+                    url: "pages/video_time.html",
+                    width: 640,
+                    height: 240
+                }).then(newWin => {
+                    videoTimeWindow = newWin;
+                });
+            }
             break;
         case "videoInfo":
             if (hostWS) {
@@ -184,14 +219,9 @@ browser.runtime.onMessage.addListener((request, sender) => {
             hostWS.addEventListener("message", (evt) => {
                 console.log(evt.data)
             });
-            browser.tabs.query({
-                currentWindow: true,
-                active: true
-            }).then(([tab]) => {
-                browser.tabs.sendMessage(tab.id, {
-                    event: "platformStart"
-                });
-            });
+
+            // if there's no monitoring tab => monitor current tab
+            if (!targetTabId) platformStart();
             break;
         case "endHostVideo":
             stopCountingOffset();
@@ -240,7 +270,33 @@ browser.runtime.onMessage.addListener((request, sender) => {
 
 browser.windows.onRemoved.addListener((windowId) => {
     if (videoTimeWindow && videoTimeWindow.id == windowId) {
-        platformStop();
         videoTimeWindow = null;
+    }
+});
+
+browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    if (tabId === targetTabId && tab.status === "complete") {
+        platformStart(tabId);
+    }
+    if (videoTimeWindow && tab.windowId === videoTimeWindow.id && tab.status === "complete") {
+        browser.runtime.sendMessage({
+            event: "updateTargetTabId",
+            tabId: targetTabId
+        });
+    };
+});
+browser.tabs.onReplaced.addListener((addedTabId, removedTabId) => {
+    if (removedTabId === targetTabId) {
+        targetTabId = addedTabId;
+        platformStart(addedTabId);
+    }
+});
+browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
+    if (tabId === targetTabId) {
+        targetTabId = null;
+        if (hostWS) {
+            hostWS.send("pause,");
+            hostWS.paused = true;
+        }
     }
 });
