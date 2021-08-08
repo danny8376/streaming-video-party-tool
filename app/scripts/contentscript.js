@@ -37,6 +37,7 @@ try {
     const params = new URLSearchParams(location.hash.slice(1));
     const wsUrl = params.get("videopartyroom");
     if (wsUrl !== null) {
+        console.log(`Room: ${wsUrl}`)
         browser.runtime.sendMessage({
             event: "roomDetected",
             wsUrl

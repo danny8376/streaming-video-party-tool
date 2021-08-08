@@ -101,8 +101,22 @@ function parseWsMessage(msg) {
     return [offset, cmd, args];
 }
 
-function playVideoParty(wsUrl) {
+function goNextVideo(videoPlatform, videoId, wsUrl) {
+    let videoUrl = "";
+    switch (videoPlatform) {
+        case "anigamer":
+            videoUrl = `https://ani.gamer.com.tw/animeVideo.php?sn=${videoId}`;
+            break;
+        case "youtube":
+            videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+            break;
+    }
+    location.href = `${videoUrl}#videopartyroomautoconfirm&videopartyroom=${encodeURIComponent(wsUrl)}`;
+}
+
+async function playVideoParty(wsUrl) {
     const platform = window.streamingVideoPartyToolPlatform;
+    let videoInfo = await platform.getVideoInfo();
     platform.init();
     injectControl();
     platform.whenPlayerReady().then(() => {
@@ -117,6 +131,12 @@ function playVideoParty(wsUrl) {
                 // TODO: stream fix mode
             } else {
                 switch (cmd) {
+                    case "video":
+                        const [videoPlatform, videoId, starttime] = args;
+                        const newVideoInfo = `${videoPlatform},${videoId}`;
+                        if (videoInfo.platform !== videoPlatform || videoInfo.id !== videoId) { // switch video
+                            goNextVideo(videoPlatform, videoId, wsUrl);
+                        }
                     case "sync":
                         platform.getCurrentTime().then(time => {
                             const [targetTimeStr] = args;
@@ -131,7 +151,9 @@ function playVideoParty(wsUrl) {
                         });
                         break;
                     case "play":
-                        platform.play();
+                        platform.whenPlayerReady().then(() => {
+                            platform.play();
+                        });
                         break;
                     case "pause":
                         platform.pause();
@@ -145,7 +167,12 @@ function playVideoParty(wsUrl) {
 browser.runtime.onMessage.addListener(request => {
     switch (request.event) {
         case "videoPartyWSUrl":
-            setupPrompt(request.wsUrl);
+            const params = new URLSearchParams(location.hash.slice(1));
+            if (params.has("videopartyroomautoconfirm")) {
+                playVideoParty(request.wsUrl);
+            } else {
+                setupPrompt(request.wsUrl);
+            }
             break;
     }
 });
