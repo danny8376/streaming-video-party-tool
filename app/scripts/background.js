@@ -280,8 +280,17 @@ browser.windows.onRemoved.addListener((windowId) => {
 });
 
 browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    if (tabId === targetTabId && tab.status === "complete") {
-        platformStart(tabId);
+    if (tabId === targetTabId) {
+        switch (tab.status) {
+            case "complete":
+                platformStart(tabId);
+                break;
+            case "loading":
+                if (hostWS) {
+                    hostWS.send("pause,");
+                    hostWS.paused = true;
+                }
+        }
     }
     if (videoTimeWindow && tab.windowId === videoTimeWindow.id && tab.status === "complete") {
         browser.runtime.sendMessage({
