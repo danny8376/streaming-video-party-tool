@@ -12,6 +12,9 @@ class PartyDummy {
     }
     injectControl(dom) { // per platform
     }
+    whenPlayerReady() {
+        return new Promise((resolve, reject) => resolve());
+    }
 }
 
 window.streamingVideoPartyToolPlatform = new PartyDummy();
