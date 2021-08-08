@@ -56,7 +56,7 @@ function injectControl() {
     offset.min = -10.0;
     offset.max = 10.0;
     offset.step = 0.01;
-    offset.value = 0;
+    offset.value = userOffset;
     const offsetAdd10ms = document.createElement("input");
     offsetAdd10ms.type = "button";
     offsetAdd10ms.value = "+0.01";
@@ -89,6 +89,30 @@ function injectControl() {
 
     mainContainer.append(offsetLabel, offsetSub1s, offsetSub100ms, offsetSub10ms, offset, offsetAdd10ms, offsetAdd100ms, offsetAdd1s);
 
+    const style = document.createElement("style");
+    style.append(`
+        .streaming-video-party-tool-controls {
+            opacity: 0.25;
+        }
+        .streaming-video-party-tool-controls input[type=number] {
+            width: 4em;
+        }
+        .streaming-video-party-tool-controls:hover {
+            opacity: 1;
+        }
+        @media (prefers-color-scheme: light) {
+            .streaming-video-party-tool-controls {
+                color: #323232;
+            }
+        }
+        @media (prefers-color-scheme: dark) {
+            .streaming-video-party-tool-controls {
+                color: #F5F5F5;
+            }
+        }
+    `);
+    mainContainer.append(style);
+
     platform.injectControl(mainContainer);
 }
 
@@ -111,7 +135,7 @@ function goNextVideo(videoPlatform, videoId, wsUrl) {
             videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
             break;
     }
-    location.href = `${videoUrl}#videopartyroomautoconfirm&videopartyroom=${encodeURIComponent(wsUrl)}`;
+    location.href = `${videoUrl}#videopartyroomautoconfirm&videopartyuseroffset=${userOffset}&videopartyroom=${encodeURIComponent(wsUrl)}`;
 }
 
 async function playVideoParty(wsUrl) {
@@ -168,6 +192,9 @@ browser.runtime.onMessage.addListener(request => {
     switch (request.event) {
         case "videoPartyWSUrl":
             const params = new URLSearchParams(location.hash.slice(1));
+            if (params.has("videopartyuseroffset")) {
+                userOffset = parseFloat(params.get("videopartyuseroffset"));
+            }
             if (params.has("videopartyroomautoconfirm")) {
                 playVideoParty(request.wsUrl);
             } else {
