@@ -7,6 +7,10 @@ class YouTube extends CommonBase {
         this.adCheckSelector = ".ytp-ad-skip-button";
     }
 
+    injectControl(dom) {
+        document.querySelector("ytd-player").insertAdjacentElement("afterend", dom);
+    }
+
     _init() {
         this.patchForSandboxEscape(`
             switch (cmd) {
