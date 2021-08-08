@@ -141,27 +141,32 @@ function goNextVideo(videoPlatform, videoId, wsUrl) {
 async function playVideoParty(wsUrl) {
     const platform = window.streamingVideoPartyToolPlatform;
     let videoInfo = await platform.getVideoInfo();
+    let playerReady = false;
     platform.init();
     injectControl();
     platform.whenPlayerReady().then(() => {
-        const ws = new WebSocket(wsUrl);
-        ws.addEventListener("close", (evt) => {
-            platform.pause(); // pause when disconnected
-            // TODO: check if pause is required
-        });
-        ws.addEventListener("message", (evt) => {
-            const [offset, cmd, args] = parseWsMessage(evt.data);
-            //if (offset !== null) {
-                // TODO: stream fix mode
-            //} else {
-                switch (cmd) {
-                    case "video":
-                        const [videoPlatform, videoId, starttime] = args;
-                        const newVideoInfo = `${videoPlatform},${videoId}`;
-                        if (videoInfo.platform !== videoPlatform || videoInfo.id !== videoId) { // switch video
-                            goNextVideo(videoPlatform, videoId, wsUrl);
-                        }
-                    case "sync":
+        playerReady = true;
+    });
+
+    const ws = new WebSocket(wsUrl);
+    ws.addEventListener("close", (evt) => {
+        platform.pause(); // pause when disconnected
+        // TODO: check if pause is required
+    });
+    ws.addEventListener("message", (evt) => {
+        const [offset, cmd, args] = parseWsMessage(evt.data);
+        //if (offset !== null) {
+            // TODO: stream fix mode
+        //} else {
+            switch (cmd) {
+                case "video":
+                    const [videoPlatform, videoId, starttime] = args;
+                    const newVideoInfo = `${videoPlatform},${videoId}`;
+                    if (videoInfo.platform !== videoPlatform || videoInfo.id !== videoId) { // switch video
+                        goNextVideo(videoPlatform, videoId, wsUrl);
+                    }
+                case "sync":
+                    if (playerReady) {
                         platform.getCurrentTime().then(time => {
                             const [targetTimeStr] = args;
                             let targetTime = parseFloat(targetTimeStr);
@@ -173,18 +178,18 @@ async function playVideoParty(wsUrl) {
                                 platform.seek(targetTime);
                             }
                         });
-                        break;
-                    case "play":
-                        platform.whenPlayerReady().then(() => {
-                            platform.play();
-                        });
-                        break;
-                    case "pause":
-                        platform.pause();
-                        break;
-                }
-            //}
-        });
+                    }
+                    break;
+                case "play":
+                    platform.whenPlayerReady().then(() => {
+                        platform.play();
+                    });
+                    break;
+                case "pause":
+                    platform.pause();
+                    break;
+            }
+        //}
     });
 }
 
