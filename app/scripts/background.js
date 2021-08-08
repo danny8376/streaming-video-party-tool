@@ -114,9 +114,11 @@ function ensureOBS() {
     }
 }
 
+
+
 browser.runtime.onMessage.addListener((request, sender) => {
     // block any non-target tab messages
-    if (sender.tab && sender.tab.id !== targetTabId) return;
+    const verifyTab = () => sender.tab && sender.tab.id === targetTabId;
     switch (request.event) {
         case "retrieveMonitoringTab":
             return new Promise((resolve, reject) => resolve(targetTabId));
@@ -146,7 +148,7 @@ browser.runtime.onMessage.addListener((request, sender) => {
             }
             break;
         case "videoInfo":
-            if (hostWS) {
+            if (hostWS && verifyTab()) {
                 const sendVideoInfo = () => {
                     const {platform, id, offset} = request.video;
                     hostWS.send(`video,${platform},${id},${offset}`);
@@ -159,7 +161,7 @@ browser.runtime.onMessage.addListener((request, sender) => {
             }
             break;
         case "videoPlayingStatus":
-            if (hostWS && hostWS.ready) {
+            if (hostWS && hostWS.ready && verifyTab()) {
                 if (request.paused === null) { // detect by time
                     if (typeof hostWS.lastTime === "undefined") {
                         hostWS.lastTime = request.time;
