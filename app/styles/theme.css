@@ -1,0 +1,51 @@
+input,
+select,
+textarea {
+    border-style: none;
+    border: 1px solid;
+    border-radius: 3px;
+}
+
+@media (prefers-color-scheme: light) {
+    input,
+    select,
+    textarea {
+        border-color: #858585;
+    }
+
+    input:disabled,
+    select:disabled,
+    textarea:disabled {
+        border-color: rgba(133, 133, 133, 0.3);
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background: #0d1117;
+        color: #c9d1d9;
+    }
+
+    a, a:visited {
+        color: #58a6ff;
+        text-decoration: none;
+    }
+    a:hover, a:hover:visited {
+        text-decoration: underline;
+    }
+
+    input,
+    select,
+    textarea {
+        color: #c9d1d9;
+        background-color: #21262d;
+        border-color: #30363d;
+    }
+
+    input:disabled,
+    select:disabled,
+    textarea:disabled {
+        background-color: rgba(33, 38, 45, 0.3);
+        border-color: rgba(48, 54, 61, 0.3);
+    }
+}
