@@ -140,9 +140,9 @@ function goNextVideo(videoPlatform, videoId, wsUrl) {
 
 async function playVideoParty(wsUrl) {
     const platform = window.streamingVideoPartyToolPlatform;
+    platform.init();
     let videoInfo = await platform.getVideoInfo();
     let playerReady = false;
-    platform.init();
     injectControl();
     platform.whenPlayerReady().then(() => {
         playerReady = true;
