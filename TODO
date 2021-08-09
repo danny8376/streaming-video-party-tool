@@ -1,3 +1,2 @@
 Fix wrongly stuck at pause when start party when playing
 Add stream offset fix support
-Add suport for keep working after reloaded page
