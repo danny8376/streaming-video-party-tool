@@ -1,5 +1,6 @@
 import { supportedHostnames } from "./lib/supported_hostnames.js";
 import { parseTimeString } from "./lib/time_util";
+import { ws2room } from "./lib/ws2room";
 import { default as OBSWebSocket } from "obs-websocket-js";
 
 browser.runtime.onInstalled.addListener((details) => {
@@ -260,13 +261,7 @@ browser.runtime.onMessage.addListener((request, sender) => {
             break;
         case "roomDetected":
             try {
-                const roomUrl = new URL(request.wsUrl);
-                roomUrl.protocol = roomUrl.protocol === "wss:" ? "https" : "http";
-                const urlWsOffset = roomUrl.pathname.lastIndexOf("ws/room/");
-                const apiPrefix = roomUrl.pathname.slice(0, urlWsOffset);
-                const roomId = roomUrl.pathname.slice(urlWsOffset + 8);
-                roomUrl.pathname = `${apiPrefix}room/${roomId}`;
-                fetch(roomUrl.href).then((res) => {
+                fetch(ws2room(request.wsUrl)).then((res) => {
                     if (res.status === 302) {
                         const tabId = sender.tab.id;
                         browser.tabs.insertCSS(tabId, {

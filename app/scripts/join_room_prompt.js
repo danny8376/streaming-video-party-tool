@@ -1,3 +1,5 @@
+import { ws2room } from "./lib/ws2room";
+
 function setupPrompt(wsUrl) {
     const mainContainer = document.createElement("div");
     mainContainer.className = "streaming-video-party-tool-prompt";
@@ -138,20 +140,39 @@ function goNextVideo(videoPlatform, videoId, wsUrl) {
     location.href = `${videoUrl}#videopartyroomautoconfirm&videopartyuseroffset=${userOffset}&videopartyroom=${encodeURIComponent(wsUrl)}`;
 }
 
-async function playVideoParty(wsUrl) {
+async function connectWS(wsUrl) {
     const platform = window.streamingVideoPartyToolPlatform;
-    platform.init();
     let videoInfo = await platform.getVideoInfo();
+    const heartbeat = null;
     let playerReady = false;
-    injectControl();
     platform.whenPlayerReady().then(() => {
         playerReady = true;
     });
 
+    const checkRoom = () => new Promise((resolve, reject) => {
+        fetch(ws2room(wsUrl)).then((res) => {
+            resolve(res.status === 302);
+        }).error(() => {
+            resolve(false);
+        });
+    });
+    const disconnected = async (evt) => {
+        clearTimeout(heartbeat); // stop heartbeat
+        if (await checkRoom()) { // room exits => should be accident, reconnect
+            connectWS(wsUrl);
+        } else {
+            platform.pause(); // pause when actually disconnected
+        }
+    };
+
     const ws = new WebSocket(wsUrl);
-    ws.addEventListener("close", (evt) => {
-        platform.pause(); // pause when disconnected
-        // TODO: check if pause is required
+    ws.addEventListener("close", disconnected);
+    ws.addEventListener("error", disconnected);
+    ws.addEventListener("open", (evt) => {
+        // purge after 1min without heartbeat, once per 15s should be plenty enough
+        heartbeat = setTimeout(() => {
+            ws.send("heartbeat");
+        }, 15000);
     });
     ws.addEventListener("message", (evt) => {
         const [offset, cmd, args] = parseWsMessage(evt.data);
@@ -191,6 +212,14 @@ async function playVideoParty(wsUrl) {
             }
         //}
     });
+}
+
+function playVideoParty(wsUrl) {
+    const platform = window.streamingVideoPartyToolPlatform;
+    platform.init();
+    injectControl();
+
+    connectWS(wsUrl);
 }
 
 browser.runtime.onMessage.addListener(request => {
