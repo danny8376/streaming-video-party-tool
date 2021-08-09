@@ -44,12 +44,27 @@ browser.storage.local.get(["roomKey", "autoStreamOffset", "streamOffset"]).then(
     updateStreamOffsetEditable(autoStreamOffset);
 });
 
+function checkSupportedTab(tab) {
+    let supported = false;
+
+    try {
+        const url = new URL(tab.url);
+        supported = supportedHostnames.includes(url.hostname);
+    } catch (ex) {
+    }
+
+    return supported;
+}
+
 function updateStatus() {
     browser.runtime.sendMessage({event: "retrieveMonitoringTab"}).then((targetTabId) => {
         browser.tabs.query({
             currentWindow: true,
             active: true
         }).then(([tab]) => {
+            const supported = checkSupportedTab(tab);
+            supportedPage = supported;
+
             if (targetTabId) {
                 doms.hostTab.value = browser.i18n.getMessage("popoutHostTabButtonSwitch");
                 if (targetTabId === tab.id) {
@@ -57,7 +72,7 @@ function updateStatus() {
                     doms.jumpToTab.disabled = true;
                     doms.hostStatus.firstChild.replaceWith(browser.i18n.getMessage("popoutHostStatusHostingCurrent"));
                 } else {
-                    doms.hostTab.disabled = false;
+                    doms.hostTab.disabled = !supported;
                     doms.jumpToTab.disabled = false;
                     browser.tabs.get(targetTabId).then(targetTab => {
                         doms.hostStatus.firstChild.replaceWith(browser.i18n.getMessage("popoutHostStatusHosting") + targetTab.title);
@@ -65,10 +80,35 @@ function updateStatus() {
                 }
             } else {
                 doms.hostTab.value = browser.i18n.getMessage("popoutHostTabButtonHost");
-                doms.hostTab.disabled = false;
+                doms.hostTab.disabled = !supported;
                 doms.jumpToTab.disabled = true;
                 doms.hostStatus.firstChild.replaceWith(browser.i18n.getMessage("popoutHostStatusIdle"));
             }
+
+            const enableFuncs = supported || !!targetTabId;
+
+            doms.popoutVideoTime.disabled = !enableFuncs;
+
+            browser.runtime.sendMessage({event: "retrieveHostingStatus"}).then(([hosting, wsUrl]) => {
+                updateHostVideoButton(hosting, enableFuncs);
+
+                const domRoomServer = doms.roomServer;
+                if (hosting) {
+                    domRoomServer.readOnly = true;
+                    domRoomServer.value = wsUrl.slice(0, wsUrl.lastIndexOf("ws/party-host/"));
+                } else {
+                    domRoomServer.readOnly = false;
+                    browser.storage.local.get("roomServer").then(({roomServer}) => {
+                        if (validateWSURL(roomServer)) {
+                            domRoomServer.value = roomServer;
+                        } else if (process.env.NODE_ENV === "development") {
+                            domRoomServer.value = "wss://video-party.test-endpoint.lan/";
+                        } else {
+                            domRoomServer.value = "wss://main.ws.video-party.saru.moe/";
+                        }
+                    });
+                }
+            });
         });
     });
 }
@@ -110,44 +150,6 @@ function updateHostVideoButton(hosting, supported) {
         doms.streamOffsetVideoId.disabled = false;
     }
 }
-
-browser.tabs.query({
-    currentWindow: true,
-    active: true
-}).then((tabs) => {
-    let supported = false;
-
-    try {
-        const url = new URL(tabs[0].url);
-        supported = supportedHostnames.includes(url.hostname);
-    } catch (ex) {
-    }
-    supportedPage = supported;
-
-    doms.popoutVideoTime.disabled = !supported;
-
-    browser.runtime.sendMessage({event: "retrieveHostingStatus"})
-        .then(([hosting, wsUrl]) => {
-            updateHostVideoButton(hosting, supported);
-
-            const domRoomServer = doms.roomServer;
-            if (hosting) {
-                domRoomServer.readOnly = true;
-                domRoomServer.value = wsUrl.slice(0, wsUrl.lastIndexOf("ws/party-host/"));
-            } else {
-                domRoomServer.readOnly = false;
-                browser.storage.local.get("roomServer").then(({roomServer}) => {
-                    if (validateWSURL(roomServer)) {
-                        domRoomServer.value = roomServer;
-                    } else if (process.env.NODE_ENV === "development") {
-                        domRoomServer.value = "wss://video-party.test-endpoint.lan/";
-                    } else {
-                        domRoomServer.value = "wss://main.ws.video-party.saru.moe/";
-                    }
-                });
-            }
-        });
-});
 
 function genRoomKey() {
     const keyBuffer = new Uint8Array(16);
