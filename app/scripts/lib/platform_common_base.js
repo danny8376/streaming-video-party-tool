@@ -3,6 +3,7 @@ import { parseTimeString } from "./time_util";
 class CommonBase extends EventTarget {
     constructor() {
         super();
+        this.platformName = this.constructor.name.toLowerCase();
         this.interval = null;
         this.sandboxEscapeOrigins = [];
         this.callbacks = {};
@@ -51,7 +52,7 @@ class CommonBase extends EventTarget {
 
     async getVideoInfo() {
         return {
-            platform: this.constructor.name.toLowerCase(),
+            platform: this.platformName,
             id: await this.getVideoId(),
             offset: 0.0
         };

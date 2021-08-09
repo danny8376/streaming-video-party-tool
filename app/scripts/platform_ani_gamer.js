@@ -3,6 +3,7 @@ import { CommonBase } from "./lib/platform_common_base";
 class AniGamer extends CommonBase {
     constructor() {
         super();
+        this.platformName = "anigamer"; // more stable to set it static
         this.sandboxEscapeOrigins = ["https://ani.gamer.com.tw"];
         this.adCheckSelector = "#adSkipButton";
         //this.timeSelector = ".vjs-current-time-display";
