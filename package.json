@@ -7,10 +7,11 @@
     "build": "webextension-toolbox build"
   },
   "devDependencies": {
-    "webextension-toolbox": "latest"
+    "webextension-toolbox": "^4.0.3"
   },
   "dependencies": {
     "base58-universal": "^1.0.0",
+    "buffer": "^6.0.3",
     "obs-websocket-js": "^4.0.2"
   }
 }
