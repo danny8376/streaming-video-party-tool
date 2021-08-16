@@ -24,6 +24,7 @@
     "*://ani.gamer.com.tw/animeVideo.php*",
     "*://www.youtube.com/watch*",
     "*://www.youtube.com/embed/*",
+    "*://www.youtube.com/clip/*",
     "storage"
   ],
   "browser_action": {
@@ -60,7 +61,8 @@
     {
       "matches": [
         "*://www.youtube.com/watch*",
-        "*://www.youtube.com/embed/*"
+        "*://www.youtube.com/embed/*",
+        "*://www.youtube.com/clip/*"
       ],
       "js": [
         "scripts/platform_youtube.js",
