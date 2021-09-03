@@ -5,7 +5,7 @@ A simple tool to hold video part mainly for streaming.
 ## Related Repo
 
 * [Webiste (streaming-video-party-tool-site)](https://github.com/danny8376/streaming-video-party-tool-site)
-* [Backend (streaming-video-party-ws-server](https://github.com/danny8376/streaming-video-party-ws-server)
+* [Backend (streaming-video-party-ws-server)](https://github.com/danny8376/streaming-video-party-ws-server)
 
 ## Releases
 
