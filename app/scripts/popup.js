@@ -4,6 +4,7 @@ import { roomKey2Id } from "./lib/room_key2id";
 import { parseTimeString, formatTimeMS, formatTimeString } from "./lib/time_util";
 import { supportedHostnames } from "./lib/supported_hostnames.js";
 import { encode as b58encode, decode as b58decode } from "base58-universal";
+import * as HtmlDurationPicker from 'html-duration-picker';
 
 localizeHtmlPage();
 

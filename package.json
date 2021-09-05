@@ -12,6 +12,7 @@
   "dependencies": {
     "base58-universal": "^1.0.0",
     "buffer": "^6.0.3",
+    "html-duration-picker": "^2.2.13",
     "obs-websocket-js": "^4.0.2"
   }
 }
