@@ -12,7 +12,8 @@ A simple tool to hold video part mainly for streaming.
 This plugin is availiable on following browser extensions stores.
 
 * [Firefox](https://addons.mozilla.org/zh-TW/firefox/addon/streaming-video-party-tool/)
-* [Chrome](https://chrome.google.com/webstore/detail/streaming-video-party-too/ejjcgcillnknldlnjomjockdceikloja)
+* [Chrome](https://chrome.google.com/webstore/detail/ejjcgcillnknldlnjomjockdceikloja)
+* [Edge](https://microsoftedge.microsoft.com/addons/detail/jniglidohojdgfdghnfoodbcbmapdfhh)
 
 Due to publishing process, the version above may not be latest, you can also grab latest release build at release page of this repo ([here](https://github.com/danny8376/streaming-video-party-tool/releases/latest)).
 
